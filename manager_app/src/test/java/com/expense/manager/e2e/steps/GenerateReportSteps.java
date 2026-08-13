@@ -25,7 +25,7 @@ public class GenerateReportSteps {
 
     private WebDriver driver;
 
-    private static final String LOGIN_URL = "http://localhost:5173/";
+    private static final String LOGIN_URL = "http://web:5173/";
 
     private String selectedStatus;
     private String selectedMonth;

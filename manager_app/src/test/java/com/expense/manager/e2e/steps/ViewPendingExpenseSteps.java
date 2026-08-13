@@ -21,7 +21,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class ViewPendingExpenseSteps {
     private WebDriver driver;
-    private static final String LOGIN_URL = "http://localhost:5173/";
+    private static final String LOGIN_URL = "http://web:5173/";
     private LoginPage loginPage;
     private EmployeeDashboardPage employeeDashboardPage;
     private SubmitExpensePage submitExpensePage;
