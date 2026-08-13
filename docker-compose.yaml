@@ -22,24 +22,5 @@ services:
     volumes:
       - db_data:/app/data
 
-  java_tests:
-    image: maven:3.9-eclipse-temurin-17
-    working_dir: /app
-    volumes:
-      - ./manager_app:/app
-    depends_on:
-      - manager_app
-      - employee_app
-    command: mvn test
-
-  python_tests:
-    image: python:3.12-slim
-    working_dir: /app
-    volumes:
-      - ./employee_app:/app
-    command: >
-      sh -c "pip install -r requirements.txt &&
-             pytest"
-
 volumes:
   db_data:
