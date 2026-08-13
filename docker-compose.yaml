@@ -23,11 +23,12 @@ services:
     volumes:
       - db_data:/app/data
 
-  selenium:
-    image: selenium/standalone-chrome:latest
-    shm_size: 2gb
-    ports:
-      - "4444:4444"
+ selenium:
+  image: selenium/standalone-chromium:latest
+  shm_size: "2gb"
+  ports:
+    - "4444:4444"
+    - "7900:7900"
 
 volumes:
   db_data:
