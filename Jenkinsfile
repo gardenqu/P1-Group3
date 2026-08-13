@@ -28,11 +28,16 @@ pipeline {
         }
 
         stage('Java Unit Tests') {
-            steps {
-                sh 'docker compose exec -T manager_app mvn test -Punit'
-            }
-        }
-
+    steps {
+        sh '''
+            docker run --rm \
+                -v "$PWD/manager_app:/app" \
+                -w /app \
+                maven:3.9-eclipse-temurin-17 \
+                mvn test -Punit
+        '''
+    }
+}
         stage('Java API Tests') {
             steps {
                 sh 'docker compose exec -T manager_app mvn test -Papi'
