@@ -1,0 +1,62 @@
+services:
+
+  java-unit-tests:
+    image: maven:3.9-eclipse-temurin-17
+    working_dir: /app
+    volumes:
+      - ./manager_app:/app
+    command:
+      - mvn
+      - test
+      - -Dtest=com.expense.manager.controller.**,com.expense.manager.dao.**
+
+  python-tests:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./employee_app:/app
+    command:
+      - sh
+      - -c
+      - pip install -r requirements.txt && pytest tests
+
+  java-api-tests:
+    image: maven:3.9-eclipse-temurin-17
+    working_dir: /app
+    volumes:
+      - ./manager_app:/app
+    command:
+      - mvn
+      - test
+      - -Dtest=com.expense.manager.app.**
+    depends_on:
+      - manager_app
+      - employee_app
+
+  java-e2e-tests:
+    image: maven:3.9-eclipse-temurin-17
+    working_dir: /app
+    volumes:
+      - ./manager_app:/app
+    command:
+      - mvn
+      - test
+      - -Dtest=com.expense.manager.e2e.**
+    depends_on:
+      - web
+      - manager_app
+      - employee_app
+
+  python-e2e-tests:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./employee_app:/app
+    command:
+      - sh
+      - -c
+      - pip install -r requirements.txt && pytest e2e
+    depends_on:
+      - web
+      - manager_app
+      - employee_app
