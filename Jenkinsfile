@@ -1,44 +1,11 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven-3.9'
-    }
-
     stages {
 
         stage('Test Jenkins') {
             steps {
                 echo 'Jenkins is working!'
-            }
-        }
-
-        stage('Java Unit Tests') {
-            steps {
-                dir('manager_app') {
-                    sh 'mvn test -Punit'
-                }
-            }
-        }
-
-        stage('Python Unit Tests') {
-    steps {
-        dir('employee_app') {
-            sh '''
-                mkdir -p /app/data
-                python3 -m venv .venv
-                .venv/bin/pip install -r requirements.txt
-                .venv/bin/pytest
-            '''
-        }
-    }
-}
-
-        stage('Build Java Application') {
-            steps {
-                dir('manager_app') {
-                    sh 'mvn package -DskipTests'
-                }
             }
         }
 
@@ -54,26 +21,34 @@ pipeline {
             }
         }
 
+        stage('Python Unit Tests') {
+            steps {
+                sh 'docker compose exec -T employee_app pytest'
+            }
+        }
+
+        stage('Java Unit Tests') {
+            steps {
+                sh 'docker compose exec -T manager_app mvn test -Punit'
+            }
+        }
+
         stage('Java API Tests') {
             steps {
-                dir('manager_app') {
-                    sh 'mvn test -Papi'
-                }
+                sh 'docker compose exec -T manager_app mvn test -Papi'
             }
         }
 
         stage('Java E2E Tests') {
             steps {
-                dir('manager_app') {
-                    sh 'mvn test -Pe2e'
-                }
+                sh 'docker compose exec -T manager_app mvn test -Pe2e'
             }
         }
     }
 
     post {
         always {
-            sh 'docker compose down'
+            sh 'docker compose down -v --remove-orphans'
         }
     }
 }
