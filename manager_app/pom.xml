@@ -21,57 +21,65 @@
     </properties>
 
     <dependencies>
+
+        <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <!-- Database -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.45.2.0</version>
         </dependency>
+
+        <!-- JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.17.2</version>
         </dependency>
 
-
-        <!-- testing  -->
+        <!-- API Testing -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
-            <!-- version is found automatically with springboot and intentionally left unspecified -->
             <scope>test</scope>
         </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
+
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
             <version>3.0</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- JUnit -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>6.1.1</version>
             <scope>test</scope>
         </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+
+        <!-- Selenium -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>4.45.0</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
 
+        <!-- Mockito -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>5.23.0</version>
             <scope>test</scope>
         </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
@@ -79,6 +87,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Allure -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit5</artifactId>
@@ -86,6 +95,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Cucumber -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
@@ -101,18 +111,21 @@
         </dependency>
 
         <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>6.1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-picocontainer</artifactId>
             <version>7.18.1</version>
             <scope>test</scope>
         </dependency>
 
+        <!-- WebDriver Manager -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>6.1.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit Platform -->
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite</artifactId>
@@ -122,33 +135,52 @@
 
     </dependencies>
 
+
     <build>
+
         <plugins>
+
+            <!-- Spring Boot -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+
                 <configuration>
-                    <mainClass>com.expense.manager.app.ManagerApplication</mainClass>
+                    <mainClass>
+                        com.expense.manager.app.ManagerApplication
+                    </mainClass>
                 </configuration>
             </plugin>
+
+
+            <!-- Manager Terminal -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
+
                 <configuration>
-                    <mainClass>com.expense.manager.terminal.ManagerTerminal</mainClass>
+                    <mainClass>
+                        com.expense.manager.terminal.ManagerTerminal
+                    </mainClass>
                 </configuration>
             </plugin>
+
+
+            <!-- JaCoCo -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
+
                 <executions>
+
                     <execution>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
+
                     <execution>
                         <id>report</id>
                         <phase>test</phase>
@@ -156,9 +188,150 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+
                 </executions>
             </plugin>
+
+
+            <!-- Maven Surefire -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.3</version>
+
+                <configuration>
+
+                    <!--
+                        Default test execution.
+                        Runs unit tests only.
+                    -->
+                    <includes>
+                        <include>**/controller/**/*Test.java</include>
+                        <include>**/dao/**/*Test.java</include>
+                    </includes>
+
+                </configuration>
+            </plugin>
+
         </plugins>
+
     </build>
+
+
+    <!-- ====================================================== -->
+    <!-- TEST PROFILES                                          -->
+    <!-- ====================================================== -->
+
+    <profiles>
+
+        <!-- ================================================== -->
+        <!-- UNIT TESTS                                         -->
+        <!-- ================================================== -->
+
+        <profile>
+
+            <id>unit</id>
+
+            <build>
+
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+
+                        <configuration>
+
+                            <includes>
+                                <include>
+                                    **/controller/**/*Test.java
+                                </include>
+
+                                <include>
+                                    **/dao/**/*Test.java
+                                </include>
+                            </includes>
+
+                        </configuration>
+
+                    </plugin>
+
+                </plugins>
+
+            </build>
+
+        </profile>
+
+
+        <!-- ================================================== -->
+        <!-- API TESTS                                          -->
+        <!-- ================================================== -->
+
+        <profile>
+
+            <id>api</id>
+
+            <build>
+
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+
+                        <configuration>
+
+                            <includes>
+                                <include>
+                                    **/app/**/*Test.java
+                                </include>
+                            </includes>
+
+                        </configuration>
+
+                    </plugin>
+
+                </plugins>
+
+            </build>
+
+        </profile>
+
+
+        <!-- ================================================== -->
+        <!-- E2E TESTS                                          -->
+        <!-- ================================================== -->
+
+        <profile>
+
+            <id>e2e</id>
+
+            <build>
+
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+
+                        <configuration>
+
+                            <includes>
+                                <include>
+                                    **/e2e/**/*Test.java
+                                </include>
+                            </includes>
+
+                        </configuration>
+
+                    </plugin>
+
+                </plugins>
+
+            </build>
+
+        </profile>
+
+    </profiles>
 
 </project>
