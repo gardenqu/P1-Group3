@@ -8,9 +8,11 @@ RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
+
 FROM build AS test
 
 RUN mvn test
+
 
 FROM build AS package
 
