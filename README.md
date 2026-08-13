@@ -29,4 +29,3 @@ In the project root, run:
 if on mac:
 allure serve employee_app/allure-results manager_app/allure-results
 
-test test test
