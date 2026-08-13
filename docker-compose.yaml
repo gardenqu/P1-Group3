@@ -5,6 +5,7 @@ services:
     depends_on:
       - employee_app
       - manager_app
+      - selenium
     ports:
       - "5173:5173"
 
@@ -21,6 +22,12 @@ services:
       - "9090:9090"
     volumes:
       - db_data:/app/data
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    shm_size: 2gb
+    ports:
+      - "4444:4444"
 
 volumes:
   db_data:
