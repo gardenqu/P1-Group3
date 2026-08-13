@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     stages {
@@ -6,84 +7,98 @@ pipeline {
         stage('Test Jenkins') {
             steps {
                 echo 'Jenkins is working!'
-                sh 'whoami'
-                sh 'docker --version'
-                sh 'docker compose version'
-                sh 'docker buildx version'
-            }
-        }
-
-        stage('Java Unit Tests') {
-            steps {
-                sh '''
-                    docker run --rm \
-                      -v "$WORKSPACE/manager_app:/app" \
-                      -w /app \
-                      maven:3.9-eclipse-temurin-17 \
-                      mvn test
-                '''
-            }
-        }
-
-        stage('Python Unit Tests') {
-            steps {
-                sh '''
-                    docker run --rm \
-                      -v "$WORKSPACE/employee_app:/app" \
-                      -w /app \
-                      python:3.12 \
-                      sh -c "
-                        pip install -r requirements.txt &&
-                        pytest tests
-                      "
-                '''
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                sh '''
-                    docker compose build
-                '''
+                dockerCompose(
+                    projectName: 'group3',
+                    composeFile: 'docker-compose.yaml',
+                    action: 'build'
+                )
+            }
+        }
+
+        stage('Java Unit Tests') {
+            steps {
+                dockerCompose(
+                    projectName: 'group3-tests',
+                    composeFile: 'docker-compose.test.yaml',
+                    services: ['java-unit-tests'],
+                    action: 'run'
+                )
+            }
+        }
+
+        stage('Python Unit Tests') {
+            steps {
+                dockerCompose(
+                    projectName: 'group3-tests',
+                    composeFile: 'docker-compose.test.yaml',
+                    services: ['python-tests'],
+                    action: 'run'
+                )
             }
         }
 
         stage('Start Applications') {
             steps {
-                sh '''
-                    docker compose up -d
-                '''
+                dockerCompose(
+                    projectName: 'group3',
+                    composeFile: 'docker-compose.yaml',
+                    action: 'up'
+                )
             }
         }
 
-        stage('Wait for Applications') {
+        stage('Java API Tests') {
             steps {
-                sh '''
-                    echo "Waiting for applications to start..."
-                    sleep 15
-                    docker compose ps
-                '''
+                dockerCompose(
+                    projectName: 'group3-tests',
+                    composeFile: 'docker-compose.test.yaml',
+                    services: ['java-api-tests'],
+                    action: 'run'
+                )
             }
         }
 
-        stage('API Tests') {
+        stage('Java E2E Tests') {
             steps {
-                echo 'API tests will run here'
+                dockerCompose(
+                    projectName: 'group3-tests',
+                    composeFile: 'docker-compose.test.yaml',
+                    services: ['java-e2e-tests'],
+                    action: 'run'
+                )
             }
         }
 
-        stage('E2E Tests') {
+        stage('Python E2E Tests') {
             steps {
-                echo 'E2E tests will run here'
+                dockerCompose(
+                    projectName: 'group3-tests',
+                    composeFile: 'docker-compose.test.yaml',
+                    services: ['python-e2e-tests'],
+                    action: 'run'
+                )
             }
         }
     }
 
     post {
         always {
-            sh '''
-                docker compose down || true
-            '''
+            dockerCompose(
+                projectName: 'group3',
+                composeFile: 'docker-compose.yaml',
+                action: 'down'
+            )
+
+            dockerCompose(
+                projectName: 'group3-tests',
+                composeFile: 'docker-compose.test.yaml',
+                action: 'down'
+            )
         }
     }
 }
