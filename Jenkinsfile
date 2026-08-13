@@ -1,38 +1,37 @@
-stage('Unit Tests') {
-    steps {
-        sh '''
-            cd manager_app
-            mvn test
-        '''
-    }
-}
+pipeline {
+    agent any
 
-stage('Build Docker Images') {
-    steps {
-        sh 'docker compose build'
-    }
-}
+    stages {
 
-stage('Start Application') {
-    steps {
-        sh 'docker compose up -d'
-    }
-}
+        stage('Test Jenkins') {
+            steps {
+                echo 'Jenkins is working!'
+                sh 'whoami'
+                sh 'docker --version'
+                sh 'docker compose version'
+            }
+        }
 
-stage('API Tests') {
-    steps {
-        sh '''
-            cd manager_app
-            # API test command here
-        '''
-    }
-}
+        stage('Unit Tests') {
+            steps {
+                sh '''
+                    cd manager_app
+                    mvn test
+                '''
+            }
+        }
 
-stage('E2E Tests') {
-    steps {
-        sh '''
-            cd manager_app
-            # E2E test command here
-        '''
+        stage('Build Docker Images') {
+            steps {
+                sh 'docker compose build'
+            }
+        }
+
+        stage('Start Application') {
+            steps {
+                sh 'docker compose up -d'
+            }
+        }
+
     }
 }
