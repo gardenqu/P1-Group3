@@ -9,14 +9,18 @@ pipeline {
                 sh 'whoami'
                 sh 'docker --version'
                 sh 'docker compose version'
+                sh 'docker buildx version'
             }
         }
 
         stage('Java Unit Tests') {
             steps {
                 sh '''
-                    cd manager_app
-                    mvn test
+                    docker run --rm \
+                      -v "$WORKSPACE/manager_app:/app" \
+                      -w /app \
+                      maven:3.9-eclipse-temurin-17 \
+                      mvn test
                 '''
             }
         }
@@ -24,21 +28,31 @@ pipeline {
         stage('Python Unit Tests') {
             steps {
                 sh '''
-                    cd employee_app
-                    pytest
+                    docker run --rm \
+                      -v "$WORKSPACE/employee_app:/app" \
+                      -w /app \
+                      python:3.12 \
+                      sh -c "
+                        pip install -r requirements.txt &&
+                        pytest tests
+                      "
                 '''
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker compose build'
+                sh '''
+                    docker compose build
+                '''
             }
         }
 
-        stage('Start Application') {
+        stage('Start Applications') {
             steps {
-                sh 'docker compose up -d'
+                sh '''
+                    docker compose up -d
+                '''
             }
         }
 
@@ -46,7 +60,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Waiting for applications to start..."
-                    sleep 10
+                    sleep 15
                     docker compose ps
                 '''
             }
@@ -54,37 +68,22 @@ pipeline {
 
         stage('API Tests') {
             steps {
-                sh '''
-                    echo "Running API tests..."
-
-                    cd manager_app
-                    mvn test
-
-                    cd ../employee_app
-                    pytest
-                '''
+                echo 'API tests will run here'
             }
         }
 
         stage('E2E Tests') {
             steps {
-                sh '''
-                    echo "Running E2E tests..."
-
-                    cd manager_app
-                    mvn test
-
-                    cd ../employee_app
-                    pytest
-                '''
+                echo 'E2E tests will run here'
             }
         }
-
     }
 
     post {
         always {
-            sh 'docker compose ps || true'
+            sh '''
+                docker compose down || true
+            '''
         }
     }
 }
