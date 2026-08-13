@@ -10,7 +10,7 @@ COPY src ./src
 
 FROM build AS test
 
-RUN mvn test -Dtest='com.expense.manager.controller.*,com.expense.manager.dao.*'
+RUN mvn test -Dtest="com.expense.manager.controller.**,com.expense.manager.dao.**"
 
 FROM build AS package
 
