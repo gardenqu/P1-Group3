@@ -22,12 +22,17 @@ pipeline {
         }
 
         stage('Python Unit Tests') {
-            steps {
-                dir('employee_app') {
-                    sh 'pytest'
-                }
-            }
+    steps {
+        dir('employee_app') {
+            sh '''
+                python3 -m venv .venv
+                .venv/bin/pip install --upgrade pip
+                .venv/bin/pip install -r requirements.txt
+                .venv/bin/pytest
+            '''
         }
+    }
+}
 
         stage('Build Java Application') {
             steps {
