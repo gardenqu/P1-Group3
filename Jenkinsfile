@@ -12,11 +12,20 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
+        stage('Java Unit Tests') {
             steps {
                 sh '''
                     cd manager_app
                     mvn test
+                '''
+            }
+        }
+
+        stage('Python Unit Tests') {
+            steps {
+                sh '''
+                    cd employee_app
+                    pytest
                 '''
             }
         }
@@ -33,5 +42,49 @@ pipeline {
             }
         }
 
+        stage('Wait for Applications') {
+            steps {
+                sh '''
+                    echo "Waiting for applications to start..."
+                    sleep 10
+                    docker compose ps
+                '''
+            }
+        }
+
+        stage('API Tests') {
+            steps {
+                sh '''
+                    echo "Running API tests..."
+
+                    cd manager_app
+                    mvn test
+
+                    cd ../employee_app
+                    pytest
+                '''
+            }
+        }
+
+        stage('E2E Tests') {
+            steps {
+                sh '''
+                    echo "Running E2E tests..."
+
+                    cd manager_app
+                    mvn test
+
+                    cd ../employee_app
+                    pytest
+                '''
+            }
+        }
+
+    }
+
+    post {
+        always {
+            sh 'docker compose ps || true'
+        }
     }
 }
