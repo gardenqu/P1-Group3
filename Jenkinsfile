@@ -27,15 +27,9 @@ pipeline {
             }
         }
 
-        stage('Java Unit Tests') {
+       stage('Java Unit Tests') {
     steps {
-        sh '''
-            docker run --rm \
-                -v "$PWD/manager_app:/app" \
-                -w /app \
-                maven:3.9-eclipse-temurin-17 \
-                mvn test -Punit
-        '''
+        sh 'docker build --target test ./manager_app'
     }
 }
         stage('Java API Tests') {
