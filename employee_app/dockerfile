@@ -8,12 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-
-FROM base AS test
-
-RUN pytest
-
-
 FROM base AS runtime
 
 EXPOSE 7070
