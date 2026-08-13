@@ -20,7 +20,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t group3-backend .'
+                sh 'docker compose build'
             }
         }
     }
