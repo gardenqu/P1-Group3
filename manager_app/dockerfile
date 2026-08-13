@@ -24,6 +24,8 @@ FROM maven:3.9-eclipse-temurin-17
 WORKDIR /app
 
 COPY --from=package /app/target/*.jar app.jar
+COPY pom.xml .
+COPY src ./src
 
 EXPOSE 9090
 
